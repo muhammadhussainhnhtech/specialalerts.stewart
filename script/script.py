@@ -32,7 +32,10 @@ def scrap_data(html):
     soup= BeautifulSoup(html, 'html.parser')
 
     data = {
+        "fname": "",
+        "lname": "",
         "results_found": "",
+        "data": []
     }
     
     main_div= soup.find('div', id='ColumnOne')
@@ -41,6 +44,19 @@ def scrap_data(html):
     td = rows[1] if len(rows) >=1 else None
     if td :
         data['results_found']= td.text.strip()
+
+    table= soup.find('table', class_= 'TableResults')
+    if table:
+        headers_tr = table.find('tr', {'valign': 'bottom'})
+        headers_tag = headers_tr.find_all('td') if headers_tr else []
+        headers = [header.text.strip() for header in headers_tag]
+        all_rows_tr = table.find_all('tr', {'valign': 'top'})
+        if all_rows_tr:
+            for row_tr in all_rows_tr:
+                row_tds= row_tr.find_all('td')
+                row_data = [row_td.text.strip() for row_td in row_tds]
+                row_object= {header: row for header, row in zip(headers, row_data)}
+                data['data'].append(row_object)
 
     return data
 
@@ -81,7 +97,7 @@ def sysInit(options, name):
         html= driver.page_source
         data= scrap_data(html)
         data['fname']= first_name
-        data['lnmae']= last_name
+        data['lname']= last_name
 
         print(json.dumps(data, indent=2))
         time.sleep(2)
