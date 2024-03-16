@@ -14,7 +14,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from fake_useragent import UserAgent
 
-base_url= "https://specialalerts.stewart.com"
+BASE_URL= "https://specialalerts.stewart.com"
 
 
 def get_random_headers():
@@ -71,7 +71,7 @@ def sysInit(options, name):
         driver.maximize_window()
 
         driver.get("https://specialalerts.stewart.com/Search")
-        time.sleep(2)
+        time.sleep(1)
 
         first_name_input = driver.find_element(By.ID, "FirstName_1")
         last_name_input = driver.find_element(By.ID, "LastName_1")
@@ -88,11 +88,9 @@ def sysInit(options, name):
         first_name_input.send_keys(first_name)
         last_name_input.send_keys(last_name)
 
-        time.sleep(1)
         # Find the "Find" button
         find_button = driver.find_element(By.ID, "ButtonFind")
         find_button.click()
-        time.sleep(2)
 
         html= driver.page_source
         data= scrap_data(html)
@@ -100,7 +98,6 @@ def sysInit(options, name):
         data['lname']= last_name
 
         print(json.dumps(data, indent=2))
-        time.sleep(2)
 
         return data
 

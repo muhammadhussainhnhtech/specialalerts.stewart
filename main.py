@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from script.script import start_scrapping
-
+from script.scrap_priorfile import start_priorfile_scrapping
 app = FastAPI()
 
 app.add_middleware(
@@ -29,6 +29,20 @@ def read_root(first_name: str = None, last_name: str = ""):
 
     return data
 
+
+@app.get("/get-priorfile-results/")
+def read_root(street_address: str= None, city: str= None, postal_code:str=None):
+    if not street_address or not city or not postal_code:
+        return "street_address and city and postal_code all keys needed"
+    
+    params= {
+        "street_address":street_address,
+        "city": city,
+        "postal_code": postal_code
+    }
+    data= start_priorfile_scrapping(params)
+
+    return data
 
 
 

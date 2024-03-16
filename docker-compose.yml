@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  scrapping_project_docker:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
