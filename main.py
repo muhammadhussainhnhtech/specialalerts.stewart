@@ -1,5 +1,5 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from script.script import start_scrapping
 from script.scrap_priorfile import start_priorfile_scrapping
@@ -18,8 +18,9 @@ def read_root():
     return {"message": "Hello, FastAPI!"}
 
 @app.get("/get-results/")
-def read_root(first_name: str = None, last_name: str = ""):
+def read_root(first_name: str = None, last_name: str = "", response: Response = None):
     if first_name is None :
+        response.status_code= 400
         return "first_name is required"
     name= {
         'fname': first_name,
@@ -31,9 +32,13 @@ def read_root(first_name: str = None, last_name: str = ""):
 
 
 @app.get("/get-priorfile-results/")
-def read_root(street_address: str= None, city: str= None, postal_code:str=None):
+def read_root(street_address: str= None, city: str= None, postal_code:str=None, response: Response = None):
     if not street_address and not city and not postal_code:
-        return "street_address and city and postal_code all keys needed"
+        response.status_code= 400
+        return {
+            "status": False,
+            "message":"street_address or city or postal_code any 1 key is required"
+            }
     
     params= {
         "street_address":street_address if street_address else "",
@@ -42,6 +47,9 @@ def read_root(street_address: str= None, city: str= None, postal_code:str=None):
     }
     data= start_priorfile_scrapping(params)
 
+    if not data['status']:
+        response.status_code= 400
+        return data
     return data
 
 

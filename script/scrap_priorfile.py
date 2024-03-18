@@ -48,7 +48,7 @@ def scrap_data(html):
         # Extract data from the first table
         first_table = table.find('table', attrs={'width': '100%', 'border': '0', 'cellpadding': '0', 'style': 'font-family: Verdana; font-size: x-small'})
         headers_td = first_table.find('tr').find_all('td')
-        headers = [header.text.strip() for header in headers_td]
+        headers = [header.text.strip().replace(" ", "_") for header in headers_td]
 
         # Extract data from each row in the first table
         all_rows_tr = first_table.find_all('tr')[1:]
@@ -70,7 +70,7 @@ def scrap_data(html):
         key, value = [part.strip().replace(' ', '_') for part in agency.split(':')]
 
         # Append the agency data to the list
-        data.append({key: value, "data":single_data})
+        data.append({key: value, "property_records":single_data})
 
     return data
 
@@ -144,7 +144,6 @@ def sysInit(options, params):
             return {
                 "status": False,
                 "message": "No results found from your params",
-                "params": params
             }
 
         all_data= []
@@ -170,7 +169,7 @@ def sysInit(options, params):
             except Exception as e:
                 break
         
-        return all_data
+        return {"status": True, "all_scraped_results": all_data}
 
 
 
