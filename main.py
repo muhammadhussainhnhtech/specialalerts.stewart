@@ -32,13 +32,13 @@ def read_root(first_name: str = None, last_name: str = ""):
 
 @app.get("/get-priorfile-results/")
 def read_root(street_address: str= None, city: str= None, postal_code:str=None):
-    if not street_address or not city or not postal_code:
+    if not street_address and not city and not postal_code:
         return "street_address and city and postal_code all keys needed"
     
     params= {
-        "street_address":street_address,
-        "city": city,
-        "postal_code": postal_code
+        "street_address":street_address if street_address else "",
+        "city": city if city else "",
+        "postal_code": postal_code if postal_code else ""
     }
     data= start_priorfile_scrapping(params)
 
