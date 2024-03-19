@@ -143,6 +143,7 @@ def sysInit(options, params):
         if message == "No results found.":
             return {
                 "status": False,
+                "all_scraped_results": [],
                 "message": "No results found from your params",
             }
 
