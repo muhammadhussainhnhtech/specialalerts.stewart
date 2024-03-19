@@ -47,9 +47,6 @@ def read_root(street_address: str= None, city: str= None, postal_code:str=None, 
     }
     data= start_priorfile_scrapping(params)
 
-    if not data['status']:
-        response.status_code= 400
-        return data
     return data
 
 
