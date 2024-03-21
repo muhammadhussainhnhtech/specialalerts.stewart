@@ -8,7 +8,7 @@ https://priorfiles.stewart.com/Search/SearchPriorFiles.aspx
 
 import time, random
 from bs4 import BeautifulSoup
-from pyvirtualdisplay import Display
+# from pyvirtualdisplay import Display
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, parse_qs
 from selenium import webdriver
@@ -79,8 +79,8 @@ def scrap_data(html):
 
 def sysInit(options, params):
 
-    display = Display(visible=0, size=(800, 600))
-    display.start()
+    # display = Display(visible=0, size=(800, 600))
+    # display.start()
     try:
         print("Starting........")
         driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
@@ -176,7 +176,7 @@ def sysInit(options, params):
 
     finally:
         print("QUIT WEB DRIVER ______________")
-        display.stop()
+        # display.stop()
 
         # Quit the WebDriver
         if driver:
@@ -190,7 +190,7 @@ def start_priorfile_scrapping(params):
 
     # Set Chrome options
     options = Options()
-    # options.headless = False
+    options.headless = True
     options.add_argument("--enable-logging")
     options.add_argument("--log-level=0")
     # options.add_argument('user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
