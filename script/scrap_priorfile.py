@@ -170,7 +170,7 @@ def sysInit(options, params):
             except Exception as e:
                 break
         
-        return {"status": True, "all_scraped_results": all_data}
+        return {"status": True, "count": len(all_data), "all_scraped_results": all_data}
 
 
 
