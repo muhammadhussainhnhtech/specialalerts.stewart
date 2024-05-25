@@ -14,6 +14,7 @@ from selenium.webdriver.chrome.options import Options
 from fake_useragent import UserAgent
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
 
 
 BASE_URL= "https://propertyinformationportal.nyc.gov/"
@@ -69,7 +70,7 @@ def scrap_data(html):
                     # Extract headers
                     headers = []
                     for th in table.find('thead').find_all('th'):
-                        headers.append(th.get_text(strip=True).replace(" ", "_").lower())
+                        headers.append(th.get_text(strip=True).replace("/", "").replace(" ", "_").lower())
                     
                     # Sales has link
                     if heading_text == "Sales":
@@ -114,7 +115,7 @@ def scrap_data(html):
                             value_p_tag= block_div.find("p", {"class": "sc-hRJfrW eAqXwF"})
                             if field_p_tag and value_p_tag:
                                 if heading_text == "Building Information":
-                                    building_information[field_p_tag.text.strip().replace(" ", "_").lower()]= value_p_tag.text.strip().replace(" ", "_")
+                                    building_information[field_p_tag.text.strip().replace(" ", "_").replace("/", "").lower()]= value_p_tag.text.strip().replace(" ", "_")
 
 
     data['building_information']= building_information
@@ -128,7 +129,7 @@ def scrap_account_history_summary(html):
     soup= BeautifulSoup(html, "html.parser")
     table = soup.find("table", {'id': 'Account History Summary'})
     # Extract headers
-    headers = [header.text.strip() for header in table.find_all('td', {'class': 'DataletTopHeading'})]
+    headers = [header.text.strip().replace("/", "").replace(" ", "_") for header in table.find_all('td', {'class': 'DataletTopHeading'})]
 
     # Extract data
     data = []
@@ -166,24 +167,19 @@ def sysInit(options, address):
             select_btn.click()
 
             # Wait for the dropdown items to be present
-            driver.implicitly_wait(10)
+            driver.implicitly_wait(20)
             
             # Click the "Address" button
             address_btn = driver.find_element(By.XPATH, "//button[contains(@class, 'dropdown-item') and text()='Address']")
             address_btn.click()
 
             # Wait for the input field to be present
-            driver.implicitly_wait(10)
+            driver.implicitly_wait(20)
             
             search_input = driver.find_element(By.XPATH, "//input[@placeholder='Find address or place']")
             search_input.send_keys(address)
+            search_input.send_keys(Keys.ENTER)
             
-            # Wait for the input field to be present
-            driver.implicitly_wait(10)
-
-            # Find the search button and click it
-            search_btn = driver.find_element(By.XPATH, "//button[contains(@class, 'esri-search__submit-button')]")
-            search_btn.click()
 
             try:
                 # Check for the presence of the alert
@@ -253,7 +249,6 @@ def sysInit(options, address):
 
     finally:
         # display.stop()
-        # Quit the WebDriver
         if driver:
             driver.quit()
 
@@ -275,6 +270,3 @@ def start_nyc_scrapping(address):
 
     data= sysInit(options, address)
     return data
-
-# start_scrapping("243 west end avenue, brooklyn, NY 11235")
-# # start_scrapping("aa")
