@@ -3,6 +3,7 @@ from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from script.script import start_scrapping
 from script.scrap_priorfile import start_priorfile_scrapping
+from script.scrap_nyc_property_poral import start_nyc_scrapping
 app = FastAPI()
 
 app.add_middleware(
@@ -49,6 +50,21 @@ def read_root(street_address: str= None, city: str= None, postal_code:str=None, 
 
     return data
 
+
+
+
+@app.get("/get-nycportal-results/")
+def read_root(address: str= None, response: Response = None):
+    if not address :
+        response.status_code= 400
+        return {
+            "status": False,
+            "message":"address key is required"
+            }
+
+    data= start_nyc_scrapping(address)
+
+    return data
 
 
 
