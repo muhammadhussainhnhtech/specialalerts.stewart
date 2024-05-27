@@ -3,8 +3,9 @@
 https://propertyinformationportal.nyc.gov/
 
 """
-import time, random
+import time
 from bs4 import BeautifulSoup
+from pyvirtualdisplay import Display
 import pandas as pd
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -153,8 +154,8 @@ def scrap_account_history_summary(html):
 
 def sysInit(options, address):
 
-    # display = Display(visible=0, size=(800, 600))
-    # display.start()
+    display = Display(visible=0, size=(800, 600))
+    display.start()
     try:
         driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
         driver.maximize_window()
@@ -163,25 +164,34 @@ def sysInit(options, address):
         # time.sleep(1)
 
         try:
-            select_btn= driver.find_element(By.XPATH, "//button[contains(@class, 'dropdown-toggle') and contains(@class, 'btn') and contains(@class, 'btn-primary')]")
+            # Wait for the "Select" button to be clickable and click it
+            select_btn = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'dropdown-toggle') and contains(@class, 'btn') and contains(@class, 'btn-primary')]"))
+            )
             select_btn.click()
 
             # Wait for the dropdown items to be present
             driver.implicitly_wait(20)
             
-            # Click the "Address" button
-            address_btn = driver.find_element(By.XPATH, "//button[contains(@class, 'dropdown-item') and text()='Address']")
+            # Wait for the "Address" button to be clickable and click it
+            address_btn = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'dropdown-item') and text()='Address']"))
+            )
             address_btn.click()
 
             # Wait for the input field to be present
             driver.implicitly_wait(20)
             
-            search_input = driver.find_element(By.XPATH, "//input[@placeholder='Find address or place']")
+            # Wait for the input field to be present
+            search_input = WebDriverWait(driver, 20).until(
+                EC.presence_of_element_located((By.XPATH, "//input[@placeholder='Find address or place']"))
+            )
             search_input.send_keys(address)
             search_input.send_keys(Keys.ENTER)
             
 
             try:
+                driver.implicitly_wait(20)
                 # Check for the presence of the alert
                 alert = driver.find_element(By.XPATH, "//div[contains(@class, 'alert-danger') and contains(@class, 'alert') and text()='Address not found within the NYC limits']")
                 alert_text = alert.text
@@ -205,12 +215,15 @@ def sysInit(options, address):
 
 
         try:
+            driver.implicitly_wait(20)
             # Find the div with class sc-tagGq etCJEH
             div_element = driver.find_element(By.CLASS_NAME, "sc-tagGq.etCJEH")
             # Find all a tags within the div
+            driver.implicitly_wait(20)
             a_tags = div_element.find_elements(By.XPATH, "//a[@class='sc-fxwrCY bJcvgu']")
             # Click on the 4th index (indexing starts from 0)
             href= a_tags[3].get_attribute("href")
+            driver.implicitly_wait(20)
             driver.execute_script("window.location.href = arguments[0]", href)
 
         except Exception as e:
@@ -228,9 +241,11 @@ def sysInit(options, address):
             account_history_button.click()            
         
         except Exception as e:
+            data['account_history_summary']= []
             return {
-                "status": False, 
+                "status": False,
                 "message": "Error while finding or clicking on the Account History button",
+                "data": data,
                 "exception": e
                 }
 
@@ -248,7 +263,7 @@ def sysInit(options, address):
 
 
     finally:
-        # display.stop()
+        display.stop()
         if driver:
             driver.quit()
 
@@ -258,7 +273,7 @@ def start_nyc_scrapping(address):
 
     # Set Chrome options
     options = Options()
-    options.headless = True
+    # options.headless = True
     options.add_argument("--enable-logging")
     options.add_argument("--log-level=0")
     # options.add_argument('user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
@@ -267,6 +282,7 @@ def start_nyc_scrapping(address):
     options.add_argument("chrome://settings/")
     options.add_argument("--lang=en")
     options.add_argument("--disable-translate")
+    options.add_argument('--timeout=500') # for loading page
 
     data= sysInit(options, address)
     return data
