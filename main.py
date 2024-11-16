@@ -2,6 +2,7 @@ import uvicorn
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from script.script import start_scrapping
+from script.script_beta import start_scrapping_beta
 from script.scrap_priorfile import start_priorfile_scrapping
 from script.scrap_nyc_property_poral import start_nyc_scrapping
 app = FastAPI()
@@ -30,6 +31,23 @@ def read_root(first_name: str = None, last_name: str = "", response: Response = 
     data= start_scrapping(name)
 
     return data
+
+@app.get("/get-results-address/")
+def read_root(street_address: str = "", city: str = "", postal_code = "", response: Response = None):
+    try:
+        address = f"{street_address} {city} {postal_code}" 
+        data= start_scrapping_beta(address)
+        return data
+    except Exception as e:
+        return {
+            "fname": "",
+            "lname": "",
+            "results_found": "0",
+            "data": [],
+            "address": address
+            }
+
+
 
 
 @app.get("/get-priorfile-results/")
