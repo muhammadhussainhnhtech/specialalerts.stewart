@@ -94,7 +94,7 @@ def sysInit(options, params):
 
         # Input your desired first name and last name
         username = "Tsahakyan"
-        password = "Tiko1979$"
+        password = "BigTigran2024!"
 
         # Clear any existing text in the fields (if any)
         username_input.clear()
