@@ -5,6 +5,7 @@ from script.script import start_scrapping
 from script.script_beta import start_scrapping_beta
 from script.scrap_priorfile import start_priorfile_scrapping
 from script.scrap_nyc_property_poral import start_nyc_scrapping
+from script.scrap_nyc_lot_block import start_nyc_lot_block
 app = FastAPI()
 
 app.add_middleware(
@@ -86,6 +87,17 @@ def read_root(address: str= None, response: Response = None):
 
 
 
+
+@app.get("/get-nyc-lotblock/")
+def read_root(address: str= None, response: Response = None):
+    if not address :
+        response.status_code= 400
+        return {
+            "status": False,
+            "message":"address key is required"
+        }
+    data= start_nyc_lot_block(address)
+    return data
 
 
 if __name__ == "__main__":
